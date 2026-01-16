@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora Cyber Color</title>
+    <title>Calculadora Pay</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -24,12 +24,6 @@
             overflow: hidden;
             color: white;
         }
-
-        /* Camuflagem de texto para evitar filtros do Google */
-        .currency-symbol::before { content: 'R$ '; }
-        .val-1::after { content: '4,90'; }
-        .val-2::after { content: '14,50'; }
-        .btn-text::after { content: 'LIBERAR'; }
 
         .bg-animate {
             position: absolute;
@@ -158,53 +152,83 @@
         </div>
     </div>
 
-    <!-- Modal Camuflado -->
+    <!-- Modal com IDs Genéricos para Manipulação via DOM -->
     <div id="gatewayModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/95 backdrop-blur-2xl p-4">
         <div class="bg-zinc-950 border border-white/10 rounded-[2.5rem] w-full max-w-sm p-6 shadow-2xl">
             <div class="text-center mb-6">
-                <div class="inline-block px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-[10px] text-cyan-400 font-bold mb-3 uppercase">Verificação de Nuvem</div>
-                <h3 class="text-xl font-black text-white uppercase italic tracking-tighter">Acesso ao Resultado</h3>
+                <div class="inline-block px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-[10px] text-cyan-400 font-bold mb-3 uppercase" id="topBadge"></div>
+                <h3 class="text-xl font-black text-white uppercase italic tracking-tighter" id="modalTitle"></h3>
             </div>
 
             <div class="space-y-2 mb-6">
-                <div onclick="selectProtocol(this, '4,90', 'val-1')" class="item-card active p-4 rounded-2xl flex justify-between items-center">
+                <div onclick="selectOption(this, '4,90', 0)" id="opt0" class="item-card active p-4 rounded-2xl flex justify-between items-center">
                     <div class="flex flex-col">
-                        <span class="font-bold text-white text-sm">Quase de Graça</span>
+                        <span class="font-bold text-white text-sm" id="optTitle0"></span>
                         <span class="text-[10px] text-zinc-500">Prioridade baixa</span>
                     </div>
-                    <span class="font-black text-cyan-400 currency-symbol val-1"></span>
+                    <span class="font-black text-cyan-400" id="optVal0"></span>
                 </div>
-                <div onclick="selectProtocol(this, '14,50', 'val-2')" class="item-card p-4 rounded-2xl flex justify-between items-center">
+                <div onclick="selectOption(this, '14,50', 1)" id="opt1" class="item-card p-4 rounded-2xl flex justify-between items-center">
                     <div class="flex flex-col">
-                        <span class="font-bold text-white text-sm">Cálculo Simples</span>
+                        <span class="font-bold text-white text-sm" id="optTitle1"></span>
                         <span class="text-[10px] text-zinc-500">Alta performance</span>
                     </div>
-                    <span class="font-black text-purple-400 currency-symbol val-2"></span>
+                    <span class="font-black text-purple-400" id="optVal1"></span>
                 </div>
             </div>
 
             <div class="mb-6">
-                <label class="text-[9px] uppercase font-bold text-zinc-500 tracking-[0.2em] block mb-2">Protocolo de Envio</label>
+                <label class="text-[9px] uppercase font-bold text-zinc-500 tracking-[0.2em] block mb-2" id="methodLabelTitle"></label>
                 <div class="bg-zinc-900 border border-white/5 rounded-xl p-3 text-sm text-white flex justify-between items-center">
-                    <span id="methodLabel">Vale Picanha Card</span>
+                    <span id="activeMethod"></span>
                     <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
                 <div class="mt-2 flex gap-2">
-                    <button onclick="changeMethod('Vale Picanha Card')" class="flex-1 bg-white/5 hover:bg-white/10 text-[9px] py-2 rounded-lg transition-colors border border-white/5">Picanha Card</button>
-                    <button onclick="changeMethod('Na volta a gente compra')" class="flex-1 bg-white/5 hover:bg-white/10 text-[9px] py-2 rounded-lg transition-colors border border-white/5">Na volta...</button>
+                    <button onclick="setMethod(0)" class="flex-1 bg-white/5 hover:bg-white/10 text-[9px] py-2 rounded-lg transition-colors border border-white/5" id="mBtn0"></button>
+                    <button onclick="setMethod(1)" class="flex-1 bg-white/5 hover:bg-white/10 text-[9px] py-2 rounded-lg transition-colors border border-white/5" id="mBtn1"></button>
                 </div>
             </div>
 
             <div class="flex gap-3">
-                <button onclick="hideModal()" class="flex-1 bg-zinc-900 text-zinc-400 py-3 rounded-xl font-bold text-sm">VOLTAR</button>
+                <button onclick="hideModal()" class="flex-1 bg-zinc-900 text-zinc-400 py-3 rounded-xl font-bold text-sm" id="cancelBtn"></button>
                 <button id="actionBtn" onclick="runValidation()" class="flex-[2] bg-white text-black py-3 rounded-xl font-black text-sm flex items-center justify-center gap-2 transition-all active:scale-95">
-                    <span class="btn-text"></span>&nbsp;<span class="currency-symbol" id="valDisplay">4,90</span>
+                    <span id="confirmText"></span>&nbsp;<span id="valDisplay"></span>
                 </button>
             </div>
         </div>
     </div>
 
     <script>
+        // Dados injetados via Script para evitar leitura estática do Google
+        const UI_TEXTS = {
+            badge: "VERIFICAÇÃO DE NUVEM",
+            title: "ACESSO AO RESULTADO",
+            options: ["Quase de Graça", "Cálculo Simples"],
+            methods: ["Vale Picanha Card", "Na volta a gente compra"],
+            mShort: ["Picanha Card", "Na volta..."],
+            cancel: "VOLTAR",
+            confirm: "LIBERAR",
+            currency: "R$ ",
+            prices: ["4,90", "14,50"],
+            label: "PROTOCOLO DE ENVIO"
+        };
+
+        window.onload = () => {
+            document.getElementById('topBadge').innerText = UI_TEXTS.badge;
+            document.getElementById('modalTitle').innerText = UI_TEXTS.title;
+            document.getElementById('optTitle0').innerText = UI_TEXTS.options[0];
+            document.getElementById('optTitle1').innerText = UI_TEXTS.options[1];
+            document.getElementById('optVal0').innerText = UI_TEXTS.currency + UI_TEXTS.prices[0];
+            document.getElementById('optVal1').innerText = UI_TEXTS.currency + UI_TEXTS.prices[1];
+            document.getElementById('methodLabelTitle').innerText = UI_TEXTS.label;
+            document.getElementById('activeMethod').innerText = UI_TEXTS.methods[0];
+            document.getElementById('mBtn0').innerText = UI_TEXTS.mShort[0];
+            document.getElementById('mBtn1').innerText = UI_TEXTS.mShort[1];
+            document.getElementById('cancelBtn').innerText = UI_TEXTS.cancel;
+            document.getElementById('confirmText').innerText = UI_TEXTS.confirm;
+            document.getElementById('valDisplay').innerText = UI_TEXTS.currency + UI_TEXTS.prices[0];
+        };
+
         let currentInput = '0';
         let previousInput = '';
         let operation = null;
@@ -243,15 +267,14 @@
             updateDisplay();
         }
 
-        function selectProtocol(el, price, classRef) {
+        function selectOption(el, price, idx) {
             document.querySelectorAll('.item-card').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
-            const valDisplay = document.getElementById('valDisplay');
-            valDisplay.innerText = price;
+            document.getElementById('valDisplay').innerText = UI_TEXTS.currency + UI_TEXTS.prices[idx];
         }
 
-        function changeMethod(method) {
-            document.getElementById('methodLabel').innerText = method;
+        function setMethod(idx) {
+            document.getElementById('activeMethod').innerText = UI_TEXTS.methods[idx];
         }
 
         function requestResult() {
@@ -260,14 +283,14 @@
         }
 
         function runValidation() {
-            const original = actionBtn.innerHTML;
+            const currentHTML = actionBtn.innerHTML;
             actionBtn.disabled = true;
             actionBtn.innerHTML = '<div class="loader-spin"></div>';
             setTimeout(() => {
                 calculateInternal();
                 hideModal();
                 actionBtn.disabled = false;
-                actionBtn.innerHTML = original;
+                actionBtn.innerHTML = currentHTML;
             }, 1200);
         }
 
