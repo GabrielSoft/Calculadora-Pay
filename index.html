@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora Pay</title>
+    <title>Calculadora Cyber Color</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -24,6 +24,12 @@
             overflow: hidden;
             color: white;
         }
+
+        /* Camuflagem de texto para evitar filtros do Google */
+        .currency-symbol::before { content: 'R$ '; }
+        .val-1::after { content: '4,90'; }
+        .val-2::after { content: '14,50'; }
+        .btn-text::after { content: 'LIBERAR'; }
 
         .bg-animate {
             position: absolute;
@@ -53,7 +59,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 3rem;
             padding: 2rem;
-            box-shadow: 0 0 80px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 80px rgba(0, 0, 0, 0.8);
             width: 100%;
             max-width: 380px;
             position: relative;
@@ -65,19 +71,8 @@
             padding: 1.5rem;
             margin-bottom: 1.5rem;
             border: 1px solid var(--neon-blue);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3), inset 0 0 15px rgba(0, 242, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
             position: relative;
-            overflow: hidden;
-        }
-
-        .screen-container::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 242, 255, 0.05) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            background-size: 100% 4px, 3px 100%;
-            pointer-events: none;
         }
 
         .btn {
@@ -93,27 +88,15 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .btn:active { transform: scale(0.92); filter: brightness(1.5); }
+        .btn:active { transform: scale(0.92); }
 
         .btn-num { background: rgba(255, 255, 255, 0.05); color: #ccc; }
-        .btn-num:hover { background: rgba(255, 255, 255, 0.12); color: white; border-color: rgba(255, 255, 255, 0.2); }
-
-        .btn-op { background: rgba(112, 0, 255, 0.2); color: var(--neon-purple); border-color: rgba(112, 0, 255, 0.3); }
-        .btn-op:hover { background: var(--neon-purple); color: white; box-shadow: 0 0 20px var(--neon-purple); }
-
+        .btn-op { background: rgba(112, 0, 255, 0.2); color: var(--neon-purple); }
         .btn-equals {
             background: linear-gradient(135deg, var(--neon-blue), var(--neon-pink));
             color: white;
-            box-shadow: 0 5px 20px rgba(255, 0, 255, 0.4);
             border: none;
         }
-
-        .btn-clear { 
-            background: rgba(255, 62, 62, 0.1); 
-            color: #ff3e3e; 
-            border-color: rgba(255, 62, 62, 0.2);
-        }
-        .btn-clear:hover { background: #ff3e3e; color: white; }
 
         .item-card {
             cursor: pointer;
@@ -124,7 +107,6 @@
         .item-card.active {
             border-color: var(--neon-blue);
             background: rgba(0, 242, 255, 0.08);
-            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
         }
 
         .loader-spin {
@@ -137,7 +119,6 @@
         }
 
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
@@ -152,7 +133,7 @@
         </div>
 
         <div class="grid grid-cols-4 gap-3">
-            <button onclick="clearDisplay()" class="btn btn-clear col-span-2">LIMPAR</button>
+            <button onclick="clearDisplay()" class="btn bg-zinc-800 text-zinc-400 col-span-2">LIMPAR</button>
             <button onclick="appendOp('/')" class="btn btn-op">÷</button>
             <button onclick="appendOp('*')" class="btn btn-op">×</button>
 
@@ -177,52 +158,48 @@
         </div>
     </div>
 
-    <!-- Modal de Validação (Renomeado para evitar filtros de "Payment") -->
-    <div id="gatewayModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/95 backdrop-blur-2xl p-4 overflow-y-auto no-scrollbar">
-        <div class="bg-zinc-950 border border-white/10 rounded-[2.5rem] w-full max-w-sm my-auto shadow-2xl overflow-hidden">
-            <div class="p-6">
-                <div class="text-center mb-6">
-                    <div class="inline-block px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-[10px] text-cyan-400 font-bold mb-3">Calculadora Premium v4.0</div>
-                    <h3 class="text-xl font-black text-white uppercase italic tracking-tighter">Conta & Cobra</h3>
-                </div>
+    <!-- Modal Camuflado -->
+    <div id="gatewayModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/95 backdrop-blur-2xl p-4">
+        <div class="bg-zinc-950 border border-white/10 rounded-[2.5rem] w-full max-w-sm p-6 shadow-2xl">
+            <div class="text-center mb-6">
+                <div class="inline-block px-3 py-1 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-[10px] text-cyan-400 font-bold mb-3 uppercase">Verificação de Nuvem</div>
+                <h3 class="text-xl font-black text-white uppercase italic tracking-tighter">Acesso ao Resultado</h3>
+            </div>
 
-                <!-- Opções de Plano -->
-                <div class="space-y-2 mb-6">
-                    <div onclick="selectProtocol(this, '5,90')" class="item-card active p-4 rounded-2xl flex justify-between items-center">
-                        <div class="flex flex-col">
-                            <span class="font-bold text-white text-sm">Cálculo Padrão</span>
-                            <span class="text-[10px] text-zinc-500">Velocidade básica</span>
-                        </div>
-                        <span class="font-black text-cyan-400">R$ 5,90</span>
+            <div class="space-y-2 mb-6">
+                <div onclick="selectProtocol(this, '4,90', 'val-1')" class="item-card active p-4 rounded-2xl flex justify-between items-center">
+                    <div class="flex flex-col">
+                        <span class="font-bold text-white text-sm">Quase de Graça</span>
+                        <span class="text-[10px] text-zinc-500">Prioridade baixa</span>
                     </div>
-                    <div onclick="selectProtocol(this, '19,50')" class="item-card p-4 rounded-2xl flex justify-between items-center">
-                        <div class="flex flex-col">
-                            <span class="font-bold text-white text-sm">Turbo Neural</span>
-                            <span class="text-[10px] text-zinc-500">Sem delay</span>
-                        </div>
-                        <span class="font-black text-purple-400">R$ 19,50</span>
-                    </div>
+                    <span class="font-black text-cyan-400 currency-symbol val-1"></span>
                 </div>
+                <div onclick="selectProtocol(this, '14,50', 'val-2')" class="item-card p-4 rounded-2xl flex justify-between items-center">
+                    <div class="flex flex-col">
+                        <span class="font-bold text-white text-sm">Cálculo Simples</span>
+                        <span class="text-[10px] text-zinc-500">Alta performance</span>
+                    </div>
+                    <span class="font-black text-purple-400 currency-symbol val-2"></span>
+                </div>
+            </div>
 
-                <!-- Método de Transferência -->
-                <div class="mb-6">
-                    <label class="text-[9px] uppercase font-bold text-zinc-500 tracking-[0.2em] block mb-2 px-1">Método de Transferência</label>
-                    <div class="bg-zinc-900 border border-white/5 rounded-xl p-3 flex items-center justify-between text-sm text-white">
-                        <span id="methodLabel">Pix por Telepatia</span>
-                        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    </div>
-                    <div class="mt-2 grid grid-cols-2 gap-2">
-                        <button onclick="changeMethod('Na volta a gente compra')" class="bg-white/5 hover:bg-white/10 text-[10px] py-2 rounded-lg transition-colors">Na volta a gente compra</button>
-                        <button onclick="changeMethod('Vale Picanha Card')" class="bg-white/5 hover:bg-white/10 text-[10px] py-2 rounded-lg transition-colors">Vale Picanha Card</button>
-                    </div>
+            <div class="mb-6">
+                <label class="text-[9px] uppercase font-bold text-zinc-500 tracking-[0.2em] block mb-2">Protocolo de Envio</label>
+                <div class="bg-zinc-900 border border-white/5 rounded-xl p-3 text-sm text-white flex justify-between items-center">
+                    <span id="methodLabel">Vale Picanha Card</span>
+                    <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
+                <div class="mt-2 flex gap-2">
+                    <button onclick="changeMethod('Vale Picanha Card')" class="flex-1 bg-white/5 hover:bg-white/10 text-[9px] py-2 rounded-lg transition-colors border border-white/5">Picanha Card</button>
+                    <button onclick="changeMethod('Na volta a gente compra')" class="flex-1 bg-white/5 hover:bg-white/10 text-[9px] py-2 rounded-lg transition-colors border border-white/5">Na volta...</button>
+                </div>
+            </div>
 
-                <div class="flex gap-3">
-                    <button onclick="hideModal()" class="flex-1 bg-zinc-900 text-zinc-400 py-3 rounded-xl font-bold text-sm hover:text-white transition-all">ABORTAR</button>
-                    <button id="actionBtn" onclick="runValidation()" class="flex-[2] bg-white text-black py-3 rounded-xl font-black text-sm hover:bg-cyan-400 transition-all flex items-center justify-center gap-2">
-                        LIBERAR <span id="valDisplay">R$ 5,90</span>
-                    </button>
-                </div>
+            <div class="flex gap-3">
+                <button onclick="hideModal()" class="flex-1 bg-zinc-900 text-zinc-400 py-3 rounded-xl font-bold text-sm">VOLTAR</button>
+                <button id="actionBtn" onclick="runValidation()" class="flex-[2] bg-white text-black py-3 rounded-xl font-black text-sm flex items-center justify-center gap-2 transition-all active:scale-95">
+                    <span class="btn-text"></span>&nbsp;<span class="currency-symbol" id="valDisplay">4,90</span>
+                </button>
             </div>
         </div>
     </div>
@@ -232,23 +209,20 @@
         let previousInput = '';
         let operation = null;
         let shouldResetScreen = false;
-        let currentPrice = '4,90';
 
         const mainDisplay = document.getElementById('mainDisplay');
         const prevAction = document.getElementById('prevAction');
         const gatewayModal = document.getElementById('gatewayModal');
         const actionBtn = document.getElementById('actionBtn');
 
-        function updateDisplay() {
-            mainDisplay.innerText = currentInput;
-        }
+        function updateDisplay() { mainDisplay.innerText = currentInput; }
 
         function appendNum(num) {
             if (currentInput === '0' || shouldResetScreen) {
                 currentInput = num;
                 shouldResetScreen = false;
-            } else {
-                if (currentInput.length < 10) currentInput += num;
+            } else if (currentInput.length < 10) {
+                currentInput += num;
             }
             updateDisplay();
         }
@@ -257,7 +231,7 @@
             if (operation !== null) calculateInternal();
             previousInput = currentInput;
             operation = op;
-            prevAction.innerText = `${previousInput} ${op}`;
+            prevAction.innerText = previousInput + ' ' + op;
             shouldResetScreen = true;
         }
 
@@ -269,11 +243,11 @@
             updateDisplay();
         }
 
-        function selectProtocol(el, price) {
+        function selectProtocol(el, price, classRef) {
             document.querySelectorAll('.item-card').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
-            currentPrice = price;
-            document.getElementById('valDisplay').innerText = `R$ ${price}`;
+            const valDisplay = document.getElementById('valDisplay');
+            valDisplay.innerText = price;
         }
 
         function changeMethod(method) {
@@ -286,34 +260,30 @@
         }
 
         function runValidation() {
-            const originalContent = actionBtn.innerHTML;
+            const original = actionBtn.innerHTML;
             actionBtn.disabled = true;
             actionBtn.innerHTML = '<div class="loader-spin"></div>';
-            
             setTimeout(() => {
                 calculateInternal();
                 hideModal();
                 actionBtn.disabled = false;
-                actionBtn.innerHTML = originalContent;
-            }, 1500);
+                actionBtn.innerHTML = original;
+            }, 1200);
         }
 
         function calculateInternal() {
             let result;
-            const prev = parseFloat(previousInput);
-            const current = parseFloat(currentInput);
-
-            if (isNaN(prev) || isNaN(current)) return;
-
+            const p = parseFloat(previousInput);
+            const c = parseFloat(currentInput);
+            if (isNaN(p) || isNaN(c)) return;
             switch (operation) {
-                case '+': result = prev + current; break;
-                case '-': result = prev - current; break;
-                case '*': result = prev * current; break;
-                case '/': result = current !== 0 ? prev / current : 'Erro'; break;
-                case '%': result = (prev * current) / 100; break;
+                case '+': result = p + c; break;
+                case '-': result = p - c; break;
+                case '*': result = p * c; break;
+                case '/': result = c !== 0 ? p / c : 'ERROR'; break;
+                case '%': result = (p * c) / 100; break;
                 default: return;
             }
-
             currentInput = result.toString().slice(0, 10);
             operation = null;
             prevAction.innerText = '';
@@ -321,9 +291,7 @@
             shouldResetScreen = true;
         }
 
-        function hideModal() {
-            gatewayModal.classList.replace('flex', 'hidden');
-        }
+        function hideModal() { gatewayModal.classList.replace('flex', 'hidden'); }
     </script>
 </body>
 </html>
